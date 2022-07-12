@@ -7,6 +7,7 @@ package it.polito.tdp.crimes;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.crimes.model.Adiacenza;
 import it.polito.tdp.crimes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,16 +26,16 @@ public class CrimesController {
     private URL location;
 
     @FXML // fx:id="boxCategoria"
-    private ComboBox<?> boxCategoria; // Value injected by FXMLLoader
+    private ComboBox<String> boxCategoria; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxGiorno"
-    private ComboBox<?> boxGiorno; // Value injected by FXMLLoader
+    private ComboBox<String> boxGiorno; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalisi"
     private Button btnAnalisi; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxArco"
-    private ComboBox<?> boxArco; // Value injected by FXMLLoader
+    private ComboBox<Adiacenza> boxArco; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnPercorso"
     private Button btnPercorso; // Value injected by FXMLLoader
@@ -45,13 +46,34 @@ public class CrimesController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Crea grafo...\n");
+    	//txtResult.appendText("Crea grafo...\n");
+    	String c=boxCategoria.getValue();
+    	String d=boxGiorno.getValue();
+    	if(c==null || d==null) {
+    		txtResult.appendText("Seleziona tutti i parametri");
+    		return;
+    	}
+    	model.creaGrafo(c, d);
+    	txtResult.appendText("#Vertici: " +model.nVertici()+" \n");
+    	txtResult.appendText("#Archi: " +model.nArchi()+" \n");
+    	for(Adiacenza a:model.getArchiMinMediano()) {
+    		txtResult.appendText("\n" + a.toString());
+    	}
+    	boxArco.getItems().addAll(model.getArchi());
+    	
     }
 
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
+    	
+    	//txtResult.appendText("Calcola percorso...\n");
     	txtResult.clear();
-    	txtResult.appendText("Calcola percorso...\n");
+    	/*Adiacenza c=boxArco.getValue();
+    	if(c==null) {
+    		txtResult.appendText("seleziona arco");
+    		return;
+    	}*/
+    	txtResult.appendText(model.cerca_cammino(boxArco.getValue()));
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -67,5 +89,8 @@ public class CrimesController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.boxCategoria.getItems().addAll(model.getCategory());
+    	this.boxGiorno.getItems().addAll(model.getDay());
+    	
     }
 }
